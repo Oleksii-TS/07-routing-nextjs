@@ -23,24 +23,19 @@ import toast from "react-hot-toast";
 import css from "./NotesPage.module.css";
 
 interface NotesClientProps {
-  initialQuery: string;
-  initialPage: number;
   initialNotes: Note[];
   initialTotalPages: number;
-  initialTag: string;
+  tag: string;
 }
 
 export default function NotesClient({
-  initialQuery,
-  initialPage,
   initialNotes,
   initialTotalPages,
-  initialTag,
+  tag,
 }: NotesClientProps) {
-  const [search, setSearch] = useState(initialQuery);
+  const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
-  const [page, setPage] = useState(initialPage);
-  const [tag] = useState(initialTag);
+  const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const queryClient = useQueryClient();
@@ -51,17 +46,12 @@ export default function NotesClient({
     isError,
     error,
   }: UseQueryResult<NotesHttpResponse, Error> = useQuery<NotesHttpResponse>({
-    queryKey: ["notes", tag, debouncedSearch, page],
+    queryKey: ["notes", debouncedSearch, page, tag],
     queryFn: () => fetchNotes(debouncedSearch, page, tag),
-    initialData:
-      page === initialPage &&
-      debouncedSearch === initialQuery &&
-      tag === initialTag
-        ? {
-            notes: initialNotes,
-            totalPages: initialTotalPages,
-          }
-        : undefined,
+    initialData: {
+      notes: initialNotes,
+      totalPages: initialTotalPages,
+    },
     placeholderData: keepPreviousData,
   });
 
@@ -77,7 +67,7 @@ export default function NotesClient({
   });
 
   const notes = data?.notes || [];
-  const pageCount = data?.totalPages || 1;
+  const pageCount = data?.totalPages ?? 1;
 
   if (isError && error) throw error;
 
@@ -122,10 +112,7 @@ export default function NotesClient({
           {createNoteMutation.isPending ? (
             <Loader />
           ) : (
-            <NoteForm
-              onCancel={() => setIsModalOpen(false)}
-              onClose={() => setIsModalOpen(false)}
-            />
+            <NoteForm onClose={() => setIsModalOpen(false)} />
           )}
         </Modal>
       )}

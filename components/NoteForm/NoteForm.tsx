@@ -13,7 +13,6 @@ interface FormValues {
 }
 
 interface NoteFormProps {
-  onCancel: () => void;
   onClose: () => void;
 }
 
@@ -34,7 +33,7 @@ const validationSchema = Yup.object({
     .required("Tag is required"),
 });
 
-export default function NoteForm({ onCancel, onClose }: NoteFormProps) {
+export default function NoteForm({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -96,7 +95,7 @@ export default function NoteForm({ onCancel, onClose }: NoteFormProps) {
             <button
               type="button"
               className={css.cancelButton}
-              onClick={onCancel}
+              onClick={onClose}
               disabled={mutation.isPending}
             >
               Cancel
