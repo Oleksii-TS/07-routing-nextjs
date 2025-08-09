@@ -16,17 +16,18 @@ import Pagination from "@/components/Pagination/Pagination";
 import NoteList from "@/components/NoteList/NoteList";
 import Modal from "@/components/Modal/Modal";
 import NoteForm from "@/components/NoteForm/NoteForm";
-import { Loader } from "@/components/Loader/Loader";
+import Loader from "@/components/Loader/Loader";
 import { ErrorMessageEmpty } from "@/components/ErrorMessageEmpty/ErrorMessageEmpty";
 import ToastContainer from "@/components/ToastContainer/ToastContainer";
 import toast from "react-hot-toast";
-import css from "../notes/NotesPage.module.css";
+import css from "./NotesPage.module.css";
 
 interface NotesClientProps {
   initialQuery: string;
   initialPage: number;
   initialNotes: Note[];
   initialTotalPages: number;
+  initialTag: string;
 }
 
 export default function NotesClient({
@@ -34,10 +35,12 @@ export default function NotesClient({
   initialPage,
   initialNotes,
   initialTotalPages,
+  initialTag,
 }: NotesClientProps) {
   const [search, setSearch] = useState(initialQuery);
   const debouncedSearch = useDebounce(search, 500);
   const [page, setPage] = useState(initialPage);
+  const [tag] = useState(initialTag);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const queryClient = useQueryClient();
@@ -48,10 +51,12 @@ export default function NotesClient({
     isError,
     error,
   }: UseQueryResult<NotesHttpResponse, Error> = useQuery<NotesHttpResponse>({
-    queryKey: ["notes", debouncedSearch, page],
-    queryFn: () => fetchNotes(debouncedSearch, page),
+    queryKey: ["notes", tag, debouncedSearch, page],
+    queryFn: () => fetchNotes(debouncedSearch, page, tag),
     initialData:
-      page === initialPage && debouncedSearch === initialQuery
+      page === initialPage &&
+      debouncedSearch === initialQuery &&
+      tag === initialTag
         ? {
             notes: initialNotes,
             totalPages: initialTotalPages,

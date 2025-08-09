@@ -15,20 +15,29 @@ const headers = {
 
 export const fetchNotes = async (
   search: string,
-  page: number
+  page: number,
+  tag?: string
 ): Promise<NotesHttpResponse> => {
-  const params = {
-    ...(search && { search }),
+  const params: Record<string, string | number> = {
     page,
-    perPage: 12,
   };
 
-  const response = await axios.get<NotesHttpResponse>(`${BASE_URL}/notes`, {
+  if (search) {
+    params.search = search;
+  }
+
+  if (tag && tag !== "All") {
+    params.tag = tag;
+  }
+
+  const { data } = await axios.get<NotesHttpResponse>(`${BASE_URL}/notes`, {
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+    },
     params,
-    headers,
   });
 
-  return response.data;
+  return data;
 };
 
 export const fetchNoteById = async (id: string): Promise<Note> => {

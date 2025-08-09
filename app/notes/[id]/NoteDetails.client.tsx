@@ -3,8 +3,8 @@
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNoteById } from "@/lib/api";
-import { Loader } from "@/components/Loader/Loader";
-import { ErrorMessage } from "@/components/ErrorMessage/ErrorMessage";
+import Loader from "@/components/Loader/Loader";
+import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
 import css from "./NoteDetails.module.css";
 
 export default function NoteDetailsClient() {
